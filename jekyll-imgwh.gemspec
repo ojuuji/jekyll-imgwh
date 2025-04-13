@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name        = "jekyll-imgwh"
-  spec.version     = "0.2"
+  spec.version     = "0.3"
   spec.summary     = "Jekyll tag for HTML <img> element with auto-generated size attributes"
   spec.description = "Jekyll tag for HTML <img> element which verifies image exists and automatically adds size attributes."
   spec.authors     = ["Mikalai Ananenka"]

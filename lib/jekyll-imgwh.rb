@@ -30,11 +30,20 @@ class JekyllImgwhTag < Liquid::Tag
     src = Liquid::Template.parse(src).render(context)
     Jekyll.logger.debug prefix, "src rendered: '#{src}'"
 
-    path = File.join(context.registers[:site].source, src).sub(/\?.*/, '')
+    relative_path = src.sub(/\?.*/, '')
+    path = File.join(context.registers[:site].source, relative_path)
     Jekyll.logger.debug prefix, "image path: '#{path}'"
-    File.file?(path) or raise LoadError, "image file '#{path}' could not be found"
 
-    size = FastImage.size(path) or raise LoadError, "could not get size of image file '#{path}'"
+    unless File.file?(path)
+      theme_root = context.registers[:site].config.dig("jekyll-imgwh", "theme_root") or raise LoadError, "image '#{path}' could not be found"
+      themed_path = File.join(theme_root, relative_path)
+      Jekyll.logger.debug prefix, "themed image path: '#{themed_path}'"
+
+      File.file?(themed_path) or raise LoadError, "image '#{path}' or '#{themed_path}' could not be found"
+      path = themed_path
+    end
+
+    size = FastImage.size(path) or raise LoadError, "could not get size of image '#{path}'"
     Jekyll.logger.debug prefix, "image size: #{size}"
 
     rest = Liquid::Template.parse(rest).render(context)
