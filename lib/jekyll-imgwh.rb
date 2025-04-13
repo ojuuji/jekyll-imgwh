@@ -17,6 +17,7 @@ class JekyllImgwhTag < Liquid::Tag
       src = src.sub("#{quote}#{quote}", quote)
 
     elsif m = @content.match(/^((?:(?!\{\{)\S|\{\{.+?\}\})+)(.*)$/)
+      quote = '"'
       src, rest = m.captures
 
     else
@@ -39,7 +40,7 @@ class JekyllImgwhTag < Liquid::Tag
     rest = Liquid::Template.parse(rest).render(context)
     Jekyll.logger.debug prefix, "rest rendered: '#{rest}'"
 
-    "<img src=\"#{src}\" width=\"#{size[0]}\" height=\"#{size[1]}\"#{rest}>"
+    "<img src=#{quote}#{src}#{quote} width=#{quote}#{size[0]}#{quote} height=#{quote}#{size[1]}#{quote}#{rest}>"
   end
 
   Liquid::Template.register_tag "img", self
