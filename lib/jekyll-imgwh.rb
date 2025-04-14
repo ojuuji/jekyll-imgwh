@@ -1,6 +1,7 @@
+require 'cgi'
 require 'fastimage'
 require 'jekyll'
-require 'jekyll-img/version'
+require 'jekyll-imgwh/version'
 
 module Jekyll::Imgwh
   class Tag < Liquid::Tag
@@ -36,7 +37,7 @@ module Jekyll::Imgwh
       src = Liquid::Template.parse(src).render(context)
       debug "src rendered: '#{src}'"
 
-      relative_path = src.sub(/\?.*/, '')
+      relative_path = CGI.unescape(src.sub(/\?.*/, ''))
       path = File.join(context.registers[:site].source, relative_path)
       debug "image path: '#{path}'"
 
