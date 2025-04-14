@@ -1,6 +1,6 @@
 module Jekyll
   module Imgwh
     NAME = "jekyll-imgwh"
-    VERSION = "0.4.2"
+    VERSION = "0.5"
   end
 end

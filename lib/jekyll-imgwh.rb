@@ -24,7 +24,7 @@ module Jekyll::Imgwh
         src = src.sub("#{quote}#{quote}", quote)
 
       elsif m = @content.match(/^((?:(?!\{\{)\S|\{\{.+?\}\})+)(.*)$/)
-        quote = '"'
+        quote = ''
         src, rest = m.captures
 
       else
