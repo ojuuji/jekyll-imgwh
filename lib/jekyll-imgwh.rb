@@ -1,6 +1,6 @@
 require 'jekyll'
 require 'fastimage'
-require_relative 'jekyll-imgwh/version'
+require 'jekyll-imgwh/version'
 
 module Jekyll::Imgwh
   class Tag < Liquid::Tag
@@ -57,6 +57,6 @@ module Jekyll::Imgwh
       "<img src=#{quote}#{src}#{quote} width=#{quote}#{size[0]}#{quote} height=#{quote}#{size[1]}#{quote}#{rest}>"
     end
 
-    Liquid::Template.register_tag "img", self
+    Liquid::Template.register_tag Jekyll::configuration().dig(NAME, "tag_name") || "img", self
   end
 end
