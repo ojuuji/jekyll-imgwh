@@ -19,11 +19,11 @@ module Jekyll::Imgwh
       debug "---"
       debug "content: '#{@content}'"
 
-      if m = @content.match(/^(["'])((?:\1\1|(?!\1).)+)\1(.*)$/)
+      if m = @content.match(/^(["'])((?:\1\1|(?!\1).)+)\1(?:\s+(.+))?$/)
         quote, src, rest = m.captures
         src = src.sub("#{quote}#{quote}", quote)
 
-      elsif m = @content.match(/^((?:(?!\{\{)\S|\{\{.+?\}\})+)(.*)$/)
+      elsif m = @content.match(/^(?!["'])((?:(?!\{\{)\S|\{\{.+?\}\})+)(?:\s+(.+))?$/)
         quote = ''
         src, rest = m.captures
 
@@ -56,7 +56,7 @@ module Jekyll::Imgwh
       rest = Liquid::Template.parse(rest).render(context)
       debug "rest rendered: '#{rest}'"
 
-      "<img src=#{quote}#{src}#{quote} width=#{quote}#{size[0]}#{quote} height=#{quote}#{size[1]}#{quote}#{rest}>"
+      "<img src=#{quote}#{src}#{quote} width=#{quote}#{size[0]}#{quote} height=#{quote}#{size[1]}#{quote}#{rest.empty? ? "" : " #{rest}"}>"
     end
 
     Liquid::Template.register_tag Jekyll::configuration().dig(NAME, "tag_name") || "img", self
