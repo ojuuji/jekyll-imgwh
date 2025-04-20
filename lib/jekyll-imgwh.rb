@@ -15,7 +15,7 @@ module Jekyll
 
         if (m = @content.match(%r/^(["'])((?:\1\1|(?!\1).)+)\1(?:\s+(.+))?$/))
           @quote, @src, @rest = m.captures
-          @src = @src.sub("#{@quote}#{@quote}", @quote)
+          @src = @src.gsub("#{@quote}#{@quote}", @quote)
 
         elsif (m = @content.match(%r/^(?!["'])((?:(?!\{\{)\S|\{\{.+?\}\})+)(?:\s+(.+))?$/))
           @quote = ""
@@ -60,9 +60,9 @@ module Jekyll
         local_path = resolve_local_path(path, context)
         return local_path if File.file?(local_path)
 
-        raise LoadError, "#{NAME}: '#{local_path}' could not be found" unless path.start_with?("/")
+        themed_path = resolve_themed_path(path, context) if path.start_with?("/")
+        raise LoadError, "#{NAME}: '#{local_path}' could not be found" unless themed_path
 
-        themed_path = resolve_themed_path(path, context)
         return themed_path if File.file?(themed_path)
 
         raise LoadError, "#{NAME}: none of '#{local_path}', '#{themed_path}' could be found"

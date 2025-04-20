@@ -1,4 +1,6 @@
-require: rubocop-jekyll
+require:
+  - rubocop-jekyll
+  - rubocop-rspec
 
 inherit_gem:
   rubocop-jekyll: .rubocop.yml
