@@ -126,7 +126,7 @@ describe Jekyll::Imgwh::Tag do
   end
 
   context "with theme" do
-    let(:overrides) { { "jekyll-imgwh" => { "theme_root" => source("../theme") } } }
+    let(:overrides) { { "theme" => "jekyll-imgwh-test-theme" } }
     let(:content) { "{% img /assets/544x304.png %}" }
 
     it "loads images from theme" do

@@ -77,8 +77,7 @@ module Jekyll
       end
 
       def resolve_themed_path(path, context)
-        theme_root = context.registers[:site].config.dig(NAME, "theme_root") or return
-        themed_path = File.join(theme_root, path)
+        themed_path = context.registers[:site].in_theme_dir(path)
         debug "themed image path: '#{themed_path}'"
 
         themed_path
