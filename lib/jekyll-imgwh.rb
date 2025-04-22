@@ -93,7 +93,7 @@ module Jekyll
         themed_path
       end
 
-      Liquid::Template.register_tag Jekyll.configuration.dig(NAME, "tag_name") || "img", self
+      Liquid::Template.register_tag "imgwh", self
     end
   end
 end

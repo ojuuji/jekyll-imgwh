@@ -12,10 +12,10 @@ gem "jekyll-imgwh", group: :jekyll_plugins, path: "/local/path/to/jekyll-imgwh"
 
 # Usage
 
-This plugin exposes Liquid tag `img` (unless overridden by the `tag_name` option) with the following syntax:
+This plugin exposes Liquid tag `imgwh` with the following syntax:
 
 ```liquid
-{% img <src> [<rest>] %}
+{% imgwh <src> [<rest>] %}
 ```
 
 i.e. `<src>` is required and `<rest>` is optional. They both can have Liquid markup.
@@ -29,7 +29,7 @@ Extra whitespace around `<src>` and `<rest>` is stripped.
 Example:
 
 ```liquid
-{%    img     "/assets/{{ site.title | slugify }}.png"     alt="{{ site.title }}"       %}
+{%    imgwh     "/assets/{{ site.title | slugify }}.png"     alt="{{ site.title }}"       %}
 ```
 
 with `site.title="My Site"` and image size 200x67 it would generate the following HTML `<img>` element:
@@ -43,27 +43,27 @@ with `site.title="My Site"` and image size 200x67 it would generate the followin
 `<src>` can be specified with single quotes, double quotes, or without quotes. This also defines quotation for the generated `src`, `width`, and `height` attributes: they always use the same quotes as `<src>`:
 
 ```
-{% img "/foo.png" %} -> <img src="/foo.png" width="123" height="456">
-{% img '/foo.png' %} -> <img src='/foo.png' width='123' height='456'>
-{% img  /foo.png  %} -> <img src=/foo.png width=123 height=456>
+{% imgwh "/foo.png" %} -> <img src="/foo.png" width="123" height="456">
+{% imgwh '/foo.png' %} -> <img src='/foo.png' width='123' height='456'>
+{% imgwh  /foo.png  %} -> <img src=/foo.png width=123 height=456>
 ```
 
 Whitespace can be freely used in single- and double-quoted `<src>`. To use the same quote character in the `<src>` value specify it twice:
 
 ```
-{% img "/f{{  'oo'  | append: "".png"" }}" %} -> OK (src="/foo.png")
-{% img "/f{{  'oo'  | append:  ".png"  }}" %} -> ERROR
-{% img '/f{{  'oo'  | append:  ".png"  }}' %} -> ERROR
-{% img '/f{{ ''oo'' | append:  ".png"  }}' %} -> OK (src='/foo.png')
+{% imgwh "/f{{  'oo'  | append: "".png"" }}" %} -> OK (src="/foo.png")
+{% imgwh "/f{{  'oo'  | append:  ".png"  }}" %} -> ERROR
+{% imgwh '/f{{  'oo'  | append:  ".png"  }}' %} -> ERROR
+{% imgwh '/f{{ ''oo'' | append:  ".png"  }}' %} -> OK (src='/foo.png')
 ```
 
 For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. between `{{` and `}}`):
 
 
 ```
-{% img  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
-{% img /My Site.png %}          -> ERROR (tries to open "/My" image)
-{% img /{{ site.title }}.png %} -> OK (src=/My Site.png)
+{% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
+{% imgwh /My Site.png %}          -> ERROR (tries to open "/My" image)
+{% imgwh /{{ site.title }}.png %} -> OK (src=/My Site.png)
 ```
 
 Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (image would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI, and plugin will extract and URL-decode path from it.
@@ -86,7 +86,6 @@ This plugin uses the following configuration options by default. The configurati
 
 ```yml
 jekyll-imgwh:
-  tag_name: img
   extra_rest:
 ```
 
@@ -97,7 +96,7 @@ These are default options i.e. you do not need to specify any of them unless you
 Remember tag syntax? This option inserts additional text to all generated images. So we may say the tag syntax is actually this:
 
 ```liquid
-{% img <src> <extra_rest> [<rest>] %}
+{% imgwh <src> <extra_rest> [<rest>] %}
 ```
 
 For example, since all generated HTML `<img>` elements get the size attributes, it might be a good idea to set lazy loading for the images:
@@ -122,7 +121,7 @@ Plugin also logs a lot of info which can help to resolve errors raised by it. Us
 
 Example markup:
 ```
-{% img "/assets/images/logo/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
+{% imgwh "/assets/images/logo/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
 ```
 
 Here is full round of debug messages for it in case of successful generation:
