@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   DESCRIPTION
   spec.authors     = ["Mikalai Ananenka"]
   spec.email       = ["ojuuji@gmail.com"]
-  spec.files       = Dir["lib/*.rb"]
+  spec.files       = Dir["lib/**/*"]
   spec.homepage    = "https://github.com/ojuuji/jekyll-imgwh"
   spec.license     = "MIT"
 
