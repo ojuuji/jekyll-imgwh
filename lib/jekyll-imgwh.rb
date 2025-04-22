@@ -31,10 +31,7 @@ module Jekyll
       end
 
       def render(context)
-        debug "---"
-        debug "content: '#{@content}'"
-        debug "src: '#{@src}'"
-        debug "rest: '#{@rest}'"
+        ["---", "content: '#{@content}'", "src: '#{@src}'", "rest: '#{@rest}'"].map { |x| debug x }
 
         src = Liquid::Template.parse(@src).render(context)
         debug "src rendered: '#{src}'"
@@ -47,11 +44,24 @@ module Jekyll
         debug "image size: #{size}"
         img << " width=#{@quote}#{size[0]}#{@quote} height=#{@quote}#{size[1]}#{@quote}"
 
-        rest = Liquid::Template.parse(@rest).render(context)
-        debug "rest rendered: '#{rest}'"
-        img << " #{rest}" unless rest.empty?
+        img << render_rest(context) << ">"
+      end
 
-        img << ">"
+      def render_rest(context)
+        rest = +""
+
+        extra_rest = context.registers[:site].config.dig(NAME, "extra_rest")
+        unless extra_rest.nil?
+          extra_rest = Liquid::Template.parse(extra_rest).render(context)
+          debug "extra_rest rendered: '#{extra_rest}'"
+          rest << " #{extra_rest}" unless extra_rest.empty?
+        end
+
+        tag_rest = Liquid::Template.parse(@rest).render(context)
+        debug "rest rendered: '#{tag_rest}'"
+        rest << " #{tag_rest}" unless tag_rest.empty?
+
+        rest
       end
 
       def resolve_path(src, context)

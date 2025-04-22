@@ -143,4 +143,22 @@ describe Jekyll::Imgwh::Tag do
       end
     end
   end
+
+  context "with extra_rest" do
+    let(:overrides) { { "jekyll-imgwh" => { "extra_rest" => 'loading="lazy"' } } }
+    let(:content) { "{% img /123x67.png alt='Hi' %}" }
+
+    it "inserts extra_rest before rest" do
+      expect(output).to match("<img src=/123x67.png width=123 height=67 loading=\"lazy\" alt='Hi'")
+    end
+
+    context "when extra_rest has liquid" do
+      let(:overrides) { { "jekyll-imgwh" => { "extra_rest" => '<!--{{ "X" | append: "Y" }}-->' } } }
+      let(:content) { "{% img /123x67.png %}" }
+
+      it "is rendered" do
+        expect(output).to include("<!--XY-->")
+      end
+    end
+  end
 end

@@ -6,22 +6,9 @@ Add preferred variant from the following to your site's `Gemfile` and run `bundl
 
 ```ruby
 gem "jekyll-imgwh", group: :jekyll_plugins
-gem "jekyll-imgwh", git: "https://github.com/ojuuji/jekyll-imgwh", group: :jekyll_plugins
-gem "jekyll-imgwh", path: "/local/path/to/jekyll-imgwh", group: :jekyll_plugins
+gem "jekyll-imgwh", group: :jekyll_plugins, git: "https://github.com/ojuuji/jekyll-imgwh"
+gem "jekyll-imgwh", group: :jekyll_plugins, path: "/local/path/to/jekyll-imgwh"
 ```
-
-# Configuration
-
-This plugin uses the following configuration options by default. The configuration file is the same as Jekyll's (which is `_config.yml` unless overridden):
-
-```yml
-jekyll-imgwh:
-    tag_name: img
-```
-
-These are default options i.e. you do not need to specify any of them unless you want to use different value.
-
-All options are described in the following sections.
 
 # Usage
 
@@ -92,6 +79,33 @@ When the image is not found, and a theme is used, and the path is absolute, imag
 ## Error Handling
 
 If plugin cannot generate HTML `<img>` element (due to a syntax error, Liquid markup error, image being nonexistent, not an image, etc.) plugin unconditionally raises an error which stops site generation.
+
+# Configuration
+
+This plugin uses the following configuration options by default. The configuration file is the same as Jekyll's (which is `_config.yml` unless overridden):
+
+```yml
+jekyll-imgwh:
+  tag_name: img
+  extra_rest:
+```
+
+These are default options i.e. you do not need to specify any of them unless you want to use different value.
+
+### `extra_rest`
+
+Remember tag syntax? This option inserts additional text to all generated images. So we may say the tag syntax is actually this:
+
+```liquid
+{% img <src> <extra_rest> [<rest>] %}
+```
+
+For example, since all generated HTML `<img>` elements get the size attributes, it might be a good idea to set lazy loading for the images:
+
+```yml
+jekyll-imgwh:
+  extra_rest: loading="lazy"
+```
 
 # Troubleshooting
 
