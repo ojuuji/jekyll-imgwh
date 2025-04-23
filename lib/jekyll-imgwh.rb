@@ -4,6 +4,7 @@ require "cgi"
 require "fastimage"
 require "jekyll"
 require "jekyll-imgwh/version"
+require "uri"
 
 module Jekyll
   module Imgwh
@@ -35,16 +36,28 @@ module Jekyll
 
         src = Liquid::Template.parse(@src).render(context)
         debug "src rendered: '#{src}'"
-        img = "<img src=#{@quote}#{src}#{@quote}"
+        img = "<img src=#{quoted src}"
 
-        path = resolve_path(src, context)
-        size = FastImage.size(path)
-        raise LoadError, "#{NAME}: could not get size of image '#{path}'" unless size
-
+        size = image_size(src, context)
         debug "image size: #{size}"
-        img << " width=#{@quote}#{size[0]}#{@quote} height=#{@quote}#{size[1]}#{@quote}"
+        img << " width=#{quoted size[0]} height=#{quoted size[1]}" << render_rest(context) << ">"
+      end
 
-        img << render_rest(context) << ">"
+      private
+
+      def quoted(value)
+        "#{@quote}#{value}#{@quote}"
+      end
+
+      def image_size(src, context)
+        uri = URI(src)
+
+        if uri.scheme.nil?
+          path = resolve_path(CGI.unescape(uri.path), context)
+          FastImage.size(path) or raise LoadError, "#{NAME}: could not get size of image '#{path}'"
+        else
+          raise ArgumentError, "#{NAME}: URIs with '#{uri.scheme}' scheme are not allowed"
+        end
       end
 
       def render_rest(context)
@@ -64,9 +77,7 @@ module Jekyll
         rest
       end
 
-      def resolve_path(src, context)
-        path = CGI.unescape(src.sub(%r!\?.*!, ""))
-
+      def resolve_path(path, context)
         local_path = resolve_local_path(path, context)
         return local_path if File.file?(local_path)
 

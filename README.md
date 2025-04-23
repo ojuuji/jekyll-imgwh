@@ -70,6 +70,8 @@ Note, in the last example, although plugin did not fire an error, generated `src
 
 ## Path Resolution
 
+When given URI contains scheme, plugin raises an error. Otherwise it uses URL-decoded path from the given URI to find the local image.
+
 When the image path is absolute, image is searched relative to the site source directory.
 
 When the image path is relative, image is searched relative to the directory of the current page (`page.dir`).
@@ -113,7 +115,7 @@ When error is related to the image image file, it mentions file path in the erro
 ```
 $ bundle exec jekyll serve
 <...>
-  Liquid Exception: jekyll-imgwh: 'Y:/ssg/www/assets/images/logo/foo.png' could not be found in index.html
+  Liquid Exception: jekyll-imgwh: 'Y:/ssg/assets/images/foo.png' could not be found in index.html
 <...>
 ```
 
@@ -121,7 +123,7 @@ Plugin also logs a lot of info which can help to resolve errors raised by it. Us
 
 Example markup:
 ```
-{% imgwh "/assets/images/logo/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
+{% imgwh "/assets/images/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
 ```
 
 Here is full round of debug messages for it in case of successful generation:
@@ -129,12 +131,12 @@ Here is full round of debug messages for it in case of successful generation:
 $ bundle exec jekyll serve --verbose
 <...>
       jekyll-imgwh: ---
-      jekyll-imgwh: content: '"/assets/images/logo/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo"'
-      jekyll-imgwh: src: '/assets/images/logo/{{ product.key }}.png'
+      jekyll-imgwh: content: '"/assets/images/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo"'
+      jekyll-imgwh: src: '/assets/images/{{ product.key }}.png'
       jekyll-imgwh: rest: 'alt="{{ project.title }} Logo" class="www-logo"'
-      jekyll-imgwh: src rendered: '/assets/images/logo/foo.png'
-      jekyll-imgwh: image path: 'Y:/ssg/www/assets/images/logo/foo.png'
+      jekyll-imgwh: src rendered: '/assets/images/foo.png'
+      jekyll-imgwh: image path: 'Y:/ssg/assets/images/foo.png'
       jekyll-imgwh: image size: [128, 64]
       jekyll-imgwh: rest rendered: 'alt="My Product Logo" class="www-logo"'
-  <...>
+<...>
 ```

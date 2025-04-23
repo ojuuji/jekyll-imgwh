@@ -161,4 +161,12 @@ describe Jekyll::Imgwh::Tag do
       end
     end
   end
+
+  context "when given uri with scheme" do
+    let(:content) { '{% imgwh "http://example.com/123x67.png" %}' }
+
+    it "raises" do
+      expect { output }.to raise_error(ArgumentError, %r!URIs with 'http' scheme are not allowed$!)
+    end
+  end
 end
