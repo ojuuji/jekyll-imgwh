@@ -53,11 +53,15 @@ module Jekyll
         uri = URI(src)
 
         if uri.scheme.nil?
-          path = resolve_path(CGI.unescape(uri.path), context)
-          FastImage.size(path) or raise LoadError, "#{NAME}: could not get size of image '#{path}'"
+          src = resolve_path(CGI.unescape(uri.path), context)
         else
-          raise ArgumentError, "#{NAME}: URIs with '#{uri.scheme}' scheme are not allowed"
+          allowed_schemes = context.registers[:site].config.dig(NAME, "allowed_schemes") || []
+          unless allowed_schemes.include?(uri.scheme)
+            raise ArgumentError, "#{NAME}: URIs with '#{uri.scheme}' scheme are not allowed"
+          end
         end
+
+        FastImage.size(src) or raise LoadError, "#{NAME}: could not get size of image '#{src}'"
       end
 
       def render_rest(context)

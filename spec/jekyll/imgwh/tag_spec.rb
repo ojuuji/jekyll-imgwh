@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 describe Jekyll::Imgwh::Tag do
-  # Jekyll.logger.log_level = :error
-
   let(:overrides) { {} }
   let(:output) do
     site = Jekyll::Site.new(Jekyll.configuration(overrides.merge({ "source" => source })))
@@ -144,7 +142,7 @@ describe Jekyll::Imgwh::Tag do
     end
   end
 
-  context "with extra_rest" do
+  context "with extra_rest option" do
     let(:overrides) { { "jekyll-imgwh" => { "extra_rest" => 'loading="lazy"' } } }
     let(:content) { "{% imgwh /123x67.png alt='Hi' %}" }
 
@@ -167,6 +165,15 @@ describe Jekyll::Imgwh::Tag do
 
     it "raises" do
       expect { output }.to raise_error(ArgumentError, %r!URIs with 'http' scheme are not allowed$!)
+    end
+
+    context "when uri scheme is in allowed_schemes option" do
+      let(:overrides) { { "jekyll-imgwh" => { "allowed_schemes" => ["data"] } } }
+      let(:content) { "{% imgwh data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI1Ii8+ %}" }
+
+      it "processes image" do
+        expect(output).to include("width=9 height=5")
+      end
     end
   end
 end

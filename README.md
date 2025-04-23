@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/jekyll-imgwh.svg)](https://badge.fury.io/rb/jekyll-imgwh)
+
 A [Jekyll](https://jekyllrb.com/) plugin to simplify maintenance of HTML `<img>` elements, which ensures image still exists and automatically fills  `width` and `height` attributes. The latter helps to avoid layout shift when the image is downloaded and painted to the screen, which is a major component of good user experience and web performance.
 
 # Installation
@@ -62,15 +64,17 @@ For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. betw
 
 ```
 {% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
-{% imgwh /My Site.png %}          -> ERROR (tries to open "/My" image)
-{% imgwh /{{ site.title }}.png %} -> OK (src=/My Site.png)
+{% imgwh /My Site.png %}                        -> ERROR (tries to open "/My" image)
+{% imgwh /{{ site.title }}.png %}               -> OK (src=/My Site.png)
 ```
 
 Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (image would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI, and plugin will extract and URL-decode path from it.
 
 ## Path Resolution
 
-When given URI contains scheme, plugin raises an error. Otherwise it uses URL-decoded path from the given URI to find the local image.
+When the given URI contains scheme, plugin raises an error unless this scheme is listed in [`allowed_schemes`](#allowed_schemes) option (which is empty by default). In case of allowed scheme plugin tries to retrieve image size using the given URI as-is.
+
+For URIs without scheme plugin uses URL-decoded path from URI to find image on the local filesystem.
 
 When the image path is absolute, image is searched relative to the site source directory.
 
@@ -88,14 +92,28 @@ This plugin uses the following configuration options by default. The configurati
 
 ```yml
 jekyll-imgwh:
+  allowed_schemes: []
   extra_rest:
 ```
 
 These are default options i.e. you do not need to specify any of them unless you want to use different value.
 
+### `allowed_schemes`
+
+By default plugin allows only local image files to be used in the tag. This means if `<src>` contains URI with a scheme, plugin raises an error.
+
+Option `allowed_schemes` adds exception for the schemes specified in it. For URIs with allowed schemes plugin will try to access them and retrieve the image size.
+
+For example, to allow HTTPS image URLs and [data URLs](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data) use the following:
+
+```yml
+jekyll-imgwh:
+  allowed_schemes: ["data", "https"]
+```
+
 ### `extra_rest`
 
-Remember tag syntax? This option inserts additional text to all generated images. So we may say the tag syntax is actually this:
+Remember `imgwh` tag syntax? This option injects additional text into all generated HTML `<img>` elements. So we may say the tag syntax is actually this:
 
 ```liquid
 {% imgwh <src> <extra_rest> [<rest>] %}
@@ -139,4 +157,15 @@ $ bundle exec jekyll serve --verbose
       jekyll-imgwh: image size: [128, 64]
       jekyll-imgwh: rest rendered: 'alt="My Product Logo" class="www-logo"'
 <...>
+```
+
+# Development
+
+To get started with the development:
+
+```sh
+git clone https://github.com/ojuuji/jekyll-imgwh.git
+cd jekyll-imgwh
+bundle install
+bundle exec rspec
 ```
