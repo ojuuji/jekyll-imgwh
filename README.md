@@ -1,10 +1,14 @@
 [![Gem Version](https://badge.fury.io/rb/jekyll-imgwh.svg)](https://badge.fury.io/rb/jekyll-imgwh)
 
-A [Jekyll](https://jekyllrb.com/) plugin to simplify maintenance of HTML `<img>` elements, which ensures image still exists and automatically fills  `width` and `height` attributes. The latter helps to avoid layout shift when the image is downloaded and painted to the screen, which is a major component of good user experience and web performance.
+A [Jekyll](https://jekyllrb.com/) plugin to simplify maintenance of the images on the site.
+
+It provides a [Liquid tag `imgwh`](#liquid-tag) for `<img>` elements, which ensures image still exists and automatically fills `width` and `height` attributes allowing image to take up space before it loads, to mitigate content layout shifts.
+
+It also provides a [Liquid filter `imgwh`](#liquid-filter), which returns image size as an array.
 
 # Installation
 
-Add preferred variant from the following to your site's `Gemfile` and run `bundle install`:
+Add preferred variant from the following ones to your site's `Gemfile` and run `bundle install`:
 
 ```ruby
 gem "jekyll-imgwh", group: :jekyll_plugins
@@ -14,13 +18,15 @@ gem "jekyll-imgwh", group: :jekyll_plugins, path: "/local/path/to/jekyll-imgwh"
 
 # Usage
 
+## Liquid Tag
+
 This plugin exposes Liquid tag `imgwh` with the following syntax:
 
 ```liquid
 {% imgwh <src> [<rest>] %}
 ```
 
-i.e. `<src>` is required and `<rest>` is optional. They both can have Liquid markup.
+i.e. `<src>` is required and `<rest>` is optional. They both can include Liquid markup.
 
 After rendering, `<rest>` is added to generated HTML `<img>` element as-is, and `<src>` is used as a value for `src` attribute.
 
@@ -40,7 +46,7 @@ with `site.title="My Site"` and image size 200x67 it would generate the followin
 <img src="/assets/my-site.png" width="200" height="67" alt="My Site">
 ```
 
-## Quotes and Whitespace
+### Quotes and Whitespace
 
 `<src>` can be specified with single quotes, double quotes, or without quotes. This also defines quotation for the generated `src`, `width`, and `height` attributes: they always use the same quotes as `<src>`:
 
@@ -61,14 +67,39 @@ Whitespace can be freely used in single- and double-quoted `<src>`. To use the s
 
 For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. between `{{` and `}}`):
 
-
 ```
 {% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
 {% imgwh /My Site.png %}                        -> ERROR (tries to open "/My" image)
 {% imgwh /{{ site.title }}.png %}               -> OK (src=/My Site.png)
 ```
 
-Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (image would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI, and plugin will extract and URL-decode path from it.
+Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (`<img>` element would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI. Plugin only extracts and URL-decodes the path from it.
+
+## Liquid Filter
+
+This plugin exposes a Liquid filter `imgwh`, which returns image size as an array.
+
+It accepts no extra arguments and follows the same [path resolution](#path-resolution) rules as the tag.
+
+For example, if `/assets/images/logo.png` size is 520x348, this template
+
+```liquid
+<pre>
+  {{ "/assets/images/logo.png" | imgwh | inspect }}
+  {{ "/assets/images/logo.png" | imgwh | first }}
+  {{ "/assets/images/logo.png" | imgwh | last }}
+</pre>
+```
+
+would render to
+
+```html
+<pre>
+  [520, 348]
+  520
+  348
+</pre>
+```
 
 ## Path Resolution
 
@@ -84,7 +115,7 @@ When the image is not found, and a theme is used, and the path is absolute, imag
 
 ## Error Handling
 
-If plugin cannot generate HTML `<img>` element (due to a syntax error, Liquid markup error, image being nonexistent, not an image, etc.) plugin unconditionally raises an error which stops site generation.
+In case plugin cannot determine the image size (due to a syntax error, Liquid template error, image being nonexistent, not an image, etc.) it unconditionally raises an error which stops the site generation.
 
 # Configuration
 
@@ -100,7 +131,7 @@ These are default options i.e. you do not need to specify any of them unless you
 
 ### `allowed_schemes`
 
-By default plugin allows only local image files to be used in the tag. This means if `<src>` contains URI with a scheme, plugin raises an error.
+By default plugin allows only local image files to be used. This means if the given image URI contains non-empty scheme, plugin raises an error.
 
 Option `allowed_schemes` adds exception for the schemes specified in it. For URIs with allowed schemes plugin will try to access them and retrieve the image size.
 
@@ -128,7 +159,7 @@ jekyll-imgwh:
 
 # Troubleshooting
 
-When error is related to the image image file, it mentions file path in the error message:
+When error is related to the image image file, plugin mentions the file path in the error message:
 
 ```
 $ bundle exec jekyll serve
@@ -139,12 +170,14 @@ $ bundle exec jekyll serve
 
 Plugin also logs a lot of info which can help to resolve errors raised by it. Use `jekyll serve --verbose` flag to output this debug info.
 
-Example markup:
+For example, for template
+
 ```
 {% imgwh "/assets/images/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
 ```
 
-Here is full round of debug messages for it in case of successful generation:
+it would print something like this in case of successful generation:
+
 ```
 $ bundle exec jekyll serve --verbose
 <...>
