@@ -69,8 +69,8 @@ For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. betw
 
 ```
 {% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
-{% imgwh /My Site.png %}                        -> ERROR (tries to open "/My" image)
-{% imgwh /{{ site.title }}.png %}               -> OK (src=/My Site.png)
+{% imgwh  /My Site.png %}                       -> ERROR (tries to open "/My" image)
+{% imgwh  /{{ site.title }}.png %}              -> OK (src=/My Site.png)
 ```
 
 Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (`<img>` element would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI. Plugin only extracts and URL-decodes the path from it.
@@ -112,6 +112,8 @@ When the image path is absolute, image is searched relative to the site source d
 When the image path is relative, image is searched relative to the directory of the current page (`page.dir`).
 
 When the image is not found, and a theme is used, and the path is absolute, image is also searched relative to the theme root directory.
+
+For the local files, like Jekyll itself, plugin does not allow using files outside the source or theme root directories (in fact, plugin uses the path sanitize helpers from Jekyll). It will not be an immediate error in this case (for example, `"/../foo.png"` i.e. one level above the site root), but the image will be searched then in the source directory and the theme root directory no matter how many levels above the site root it is.
 
 ## Error Handling
 
@@ -156,6 +158,8 @@ For example, since all generated HTML `<img>` elements get the size attributes, 
 jekyll-imgwh:
   extra_rest: loading="lazy"
 ```
+
+Like `<src>` and `<rest>`, `<extra_rest>` can also include Liquid markup, which is rendered in context of images where `<extra_rest>` is injected.
 
 # Troubleshooting
 

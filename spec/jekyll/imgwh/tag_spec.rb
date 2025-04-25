@@ -18,6 +18,15 @@ describe Jekyll::Imgwh::Tag do
     end
   end
 
+  context "when the specified path is outside source dir" do
+    let(:content) { '{% imgwh "/../../../error.png" %}' }
+
+    it "is searched in the source dir (per Jekyll's in_source_dir)" do
+      expect { output }.to \
+        raise_error(LoadError, "jekyll-imgwh: '#{source "/error.png"}' could not be found")
+    end
+  end
+
   context "when path has liquid" do
     let(:content) { %({% imgwh "{{ '/123' | append: 'x67.png' }}" %}) }
 
@@ -161,7 +170,7 @@ describe Jekyll::Imgwh::Tag do
   end
 
   context "when given uri with scheme" do
-    let(:content) { '{% imgwh "http://example.com/123x67.png" %}' }
+    let(:content) { '{% imgwh "HTTP://example.com/123x67.png" %}' }
 
     it "raises" do
       expect { output }.to raise_error(ArgumentError, %r!URIs with 'http' scheme are not allowed$!)

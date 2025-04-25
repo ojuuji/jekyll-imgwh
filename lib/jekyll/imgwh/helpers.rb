@@ -30,7 +30,7 @@ module Jekyll
 
       def resolve_path(path, context)
         local_path = path.start_with?("/") ? path : File.join(context.registers[:page]["dir"], path)
-        local_path = File.join(context.registers[:site].source, local_path)
+        local_path = context.registers[:site].in_source_dir(local_path)
         debug "image path: '#{local_path}'"
         return local_path if File.file?(local_path)
 
