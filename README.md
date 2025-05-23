@@ -43,17 +43,17 @@ Example:
 with `site.title="My Site"` and image size 200x67 it would generate the following HTML `<img>` element:
 
 ```html
-<img src="/assets/my-site.png" width="200" height="67" alt="My Site">
+<img src="/assets/my-site.png" width="200" height="67" loading="lazy" alt="My Site">
 ```
 
 #### Quotes and Whitespace
 
-`<src>` can be specified with single quotes, double quotes, or without quotes. This also defines quotation for the generated `src`, `width`, and `height` attributes: they always use the same quotes as `<src>`:
+`<src>` can be specified with single quotes, double quotes, or without quotes. This also defines quotation for auto generated attributes: they always use the same quotes as `<src>`:
 
 ```liquid
-{% imgwh "/foo.png" %} ⟶ <img src="/foo.png" width="123" height="456">
-{% imgwh '/foo.png' %} ⟶ <img src='/foo.png' width='123' height='456'>
-{% imgwh  /foo.png  %} ⟶ <img src=/foo.png width=123 height=456>
+{% imgwh "/foo.png" %} ⟶ <img src="/foo.png" width="123" height="456" loading="lazy">
+{% imgwh '/foo.png' %} ⟶ <img src='/foo.png' width='123' height='456' loading='lazy'>
+{% imgwh  /foo.png  %} ⟶ <img src=/foo.png width=123 height=456 loading=lazy>
 ```
 
 Whitespace can be freely used in single- and double-quoted `<src>`. To use the same quote character in the `<src>` value specify it twice:
@@ -126,7 +126,7 @@ This plugin uses the following configuration options by default. The configurati
 ```yml
 imgwh:
   allowed_schemes: []
-  extra_rest:
+  extra_rest: loading="lazy"
 ```
 
 These are default options i.e. you do not need to specify any of them unless you want to use different value.
@@ -152,11 +152,13 @@ Remember `imgwh` tag syntax? This option injects additional text into all genera
 {% imgwh <src> <extra_rest> [<rest>] %}
 ```
 
-For example, since all generated HTML `<img>` elements get the size attributes, it might be a good idea to set lazy loading for the images:
+Since all generated HTML `<img>` elements get the size attributes, plugin also sets lazy loading for the images via this option.
+
+If you want to omit any extra attributes, set `extra_rest` to an empty value:
 
 ```yml
 imgwh:
-  extra_rest: loading="lazy"
+  extra_rest: ""
 ```
 
 Like `<src>` and `<rest>`, `<extra_rest>` can also include Liquid markup, which is rendered in context of images where `<extra_rest>` is injected.

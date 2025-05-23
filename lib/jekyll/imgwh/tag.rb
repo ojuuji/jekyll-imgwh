@@ -45,8 +45,9 @@ module Jekyll
       def render_rest(context)
         rest = +""
 
-        extra_rest = context.registers[:site].config.dig(@tag_name, "extra_rest")
-        unless extra_rest.nil?
+        site = context.registers[:site]
+        extra_rest = site.config.dig(@tag_name, "extra_rest") || "loading=#{quoted "lazy"}"
+        unless extra_rest.empty?
           extra_rest = Liquid::Template.parse(extra_rest).render(context)
           debug "extra_rest rendered: #{extra_rest.inspect}"
           rest << " #{extra_rest}" unless extra_rest.empty?

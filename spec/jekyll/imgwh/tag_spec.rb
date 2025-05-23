@@ -22,8 +22,7 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { '{% imgwh "/../../../error.png" %}' }
 
     it "is searched in the source dir (per Jekyll's in_source_dir)" do
-      expect { output }.to \
-        raise_error(LoadError, "imgwh: '#{source "/error.png"}' could not be found")
+      expect { output }.to raise_error(LoadError, "imgwh: '#{source "/error.png"}' could not be found")
     end
   end
 
@@ -39,7 +38,7 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { '{% imgwh "/123x67.png" %}' }
 
     it "produces attrs with double quotes" do
-      expect(output).to match('<img src="/123x67.png" width="123" height="67">')
+      expect(output).to match('<img src="/123x67.png" width="123" height="67" loading="lazy">')
     end
 
     context "when need to escape double quote in path" do
@@ -55,7 +54,7 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { "{% imgwh '/123x67.png' %}" }
 
     it "produces attrs with single quotes" do
-      expect(output).to match("<img src='/123x67.png' width='123' height='67'>")
+      expect(output).to match("<img src='/123x67.png' width='123' height='67' loading='lazy'>")
     end
 
     context "when need to escape single quote in path" do
@@ -71,7 +70,7 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { "{% imgwh /123x67.png %}" }
 
     it "produces attrs without quotes" do
-      expect(output).to match("<img src=/123x67.png width=123 height=67>")
+      expect(output).to match("<img src=/123x67.png width=123 height=67 loading=lazy>")
     end
 
     context "when whitespace is in liquid" do
@@ -95,7 +94,7 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { '{% imgwh      "/123x67.png"        %}' }
 
     it "is stripped" do
-      expect(output).to match('<img src="/123x67.png" width="123" height="67">')
+      expect(output).to match('<img src="/123x67.png" width="123" height="67" loading="lazy">')
     end
   end
 
@@ -103,14 +102,14 @@ describe Jekyll::Imgwh::Tag do
     let(:content) { %({% imgwh '/123x67.png' alt="hello" %}) }
 
     it "appends rest to the end" do
-      expect(output).to match(%(<img src='/123x67.png' width='123' height='67' alt="hello">))
+      expect(output).to match(%(<img src='/123x67.png' width='123' height='67' loading='lazy' alt="hello">))
     end
 
     context "when there is extra whitespace before the rest" do
       let(:content) { "{% imgwh '/123x67.png'      \t\n   alt='hello' %}" }
 
       it "is stripped" do
-        expect(output).to match("<img src='/123x67.png' width='123' height='67' alt='hello'>")
+        expect(output).to match("<img src='/123x67.png' width='123' height='67' loading='lazy' alt='hello'>")
       end
     end
 
@@ -152,11 +151,11 @@ describe Jekyll::Imgwh::Tag do
   end
 
   context "with extra_rest option" do
-    let(:overrides) { { "imgwh" => { "extra_rest" => 'loading="lazy"' } } }
+    let(:overrides) { { "imgwh" => { "extra_rest" => 'foo="bar"' } } }
     let(:content) { "{% imgwh /123x67.png alt='Hi' %}" }
 
     it "inserts extra_rest before rest" do
-      expect(output).to match("<img src=/123x67.png width=123 height=67 loading=\"lazy\" alt='Hi'")
+      expect(output).to match("<img src=/123x67.png width=123 height=67 foo=\"bar\" alt='Hi'>")
     end
 
     context "when extra_rest has liquid" do
@@ -165,6 +164,15 @@ describe Jekyll::Imgwh::Tag do
 
       it "is rendered" do
         expect(output).to include("<!--XY-->")
+      end
+    end
+
+    context "when extra_rest is empty" do
+      let(:overrides) { { "imgwh" => { "extra_rest" => "" } } }
+      let(:content) { "{% imgwh /123x67.png alt='Hi' %}" }
+
+      it "is omitted" do
+        expect(output).to include("height=67 alt='Hi'")
       end
     end
   end

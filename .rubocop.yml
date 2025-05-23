@@ -4,3 +4,6 @@ require:
 
 inherit_gem:
   rubocop-jekyll: .rubocop.yml
+
+Layout/LineLength:
+  Exclude: ['spec/**/*']
