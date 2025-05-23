@@ -3,7 +3,7 @@
 require_relative "lib/jekyll/imgwh/version"
 
 Gem::Specification.new do |spec|
-  spec.name     = Jekyll::Imgwh::NAME
+  spec.name     = "jekyll-imgwh"
   spec.version  = Jekyll::Imgwh::VERSION
   spec.authors  = ["Mikalai Ananenka"]
   spec.email    = ["ojuuji@gmail.com"]
