@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/jekyll-imgwh.svg)](https://badge.fury.io/rb/jekyll-imgwh)
+# jekyll-imgwh [![Gem Version](https://badge.fury.io/rb/jekyll-imgwh.svg)](https://badge.fury.io/rb/jekyll-imgwh)
 
 A [Jekyll](https://jekyllrb.com/) plugin to simplify maintenance of the images on the site.
 
@@ -6,7 +6,7 @@ It provides a [Liquid tag `imgwh`](#liquid-tag) for `<img>` elements, which ensu
 
 It also provides a [Liquid filter `imgwh`](#liquid-filter), which returns image size as an array.
 
-# Installation
+## Installation
 
 Add preferred variant from the following ones to your site's `Gemfile` and run `bundle install`:
 
@@ -16,9 +16,9 @@ gem "jekyll-imgwh", group: :jekyll_plugins, git: "https://github.com/ojuuji/jeky
 gem "jekyll-imgwh", group: :jekyll_plugins, path: "/local/path/to/jekyll-imgwh"
 ```
 
-# Usage
+## Usage
 
-## Liquid Tag
+### Liquid Tag
 
 This plugin exposes Liquid tag `imgwh` with the following syntax:
 
@@ -46,36 +46,36 @@ with `site.title="My Site"` and image size 200x67 it would generate the followin
 <img src="/assets/my-site.png" width="200" height="67" alt="My Site">
 ```
 
-### Quotes and Whitespace
+#### Quotes and Whitespace
 
 `<src>` can be specified with single quotes, double quotes, or without quotes. This also defines quotation for the generated `src`, `width`, and `height` attributes: they always use the same quotes as `<src>`:
 
-```
-{% imgwh "/foo.png" %} -> <img src="/foo.png" width="123" height="456">
-{% imgwh '/foo.png' %} -> <img src='/foo.png' width='123' height='456'>
-{% imgwh  /foo.png  %} -> <img src=/foo.png width=123 height=456>
+```liquid
+{% imgwh "/foo.png" %} ⟶ <img src="/foo.png" width="123" height="456">
+{% imgwh '/foo.png' %} ⟶ <img src='/foo.png' width='123' height='456'>
+{% imgwh  /foo.png  %} ⟶ <img src=/foo.png width=123 height=456>
 ```
 
 Whitespace can be freely used in single- and double-quoted `<src>`. To use the same quote character in the `<src>` value specify it twice:
 
-```
-{% imgwh "/f{{  'oo'  | append: "".png"" }}" %} -> OK (src="/foo.png")
-{% imgwh "/f{{  'oo'  | append:  ".png"  }}" %} -> ERROR
-{% imgwh '/f{{  'oo'  | append:  ".png"  }}' %} -> ERROR
-{% imgwh '/f{{ ''oo'' | append:  ".png"  }}' %} -> OK (src='/foo.png')
+```liquid
+{% imgwh "/f{{  'oo'  | append: "".png"" }}" %} ⟶ OK (src="/foo.png")
+{% imgwh "/f{{  'oo'  | append:  ".png"  }}" %} ⟶ ERROR
+{% imgwh '/f{{  'oo'  | append:  ".png"  }}' %} ⟶ ERROR
+{% imgwh '/f{{ ''oo'' | append:  ".png"  }}' %} ⟶ OK (src='/foo.png')
 ```
 
 For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. between `{{` and `}}`):
 
-```
-{% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} -> OK (src=/foo.png)
-{% imgwh  /My Site.png %}                       -> ERROR (tries to open "/My" image)
-{% imgwh  /{{ site.title }}.png %}              -> OK (src=/My Site.png)
+```liquid
+{% imgwh  /f{{  'oo'  | append:  ".png"  }}  %} ⟶ OK (src=/foo.png)
+{% imgwh  /My Site.png %}                       ⟶ ERROR (tries to open "/My" image)
+{% imgwh  /{{ site.title }}.png %}              ⟶ OK (src=/My Site.png)
 ```
 
 Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (`<img>` element would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI. Plugin only extracts and URL-decodes the path from it.
 
-## Liquid Filter
+### Liquid Filter
 
 This plugin exposes a Liquid filter `imgwh`, which returns image size as an array.
 
@@ -101,7 +101,7 @@ would render to
 </pre>
 ```
 
-## Path Resolution
+### Path Resolution
 
 When the given URI contains scheme, plugin raises an error unless this scheme is listed in [`allowed_schemes`](#allowed_schemes) option (which is empty by default). In case of allowed scheme plugin tries to retrieve image size using the given URI as-is.
 
@@ -115,16 +115,16 @@ When the image is not found, and a theme is used, and the path is absolute, imag
 
 For the local files, like Jekyll itself, plugin does not allow using files outside the source or theme root directories (in fact, plugin uses the path sanitize helpers from Jekyll). It will not be an immediate error in this case (for example, `"/../foo.png"` i.e. one level above the site root), but the image will be searched then in the source directory and the theme root directory no matter how many levels above the site root it is.
 
-## Error Handling
+### Error Handling
 
 In case plugin cannot determine the image size (due to a syntax error, Liquid template error, image being nonexistent, not an image, etc.) it unconditionally raises an error which stops the site generation.
 
-# Configuration
+## Configuration
 
 This plugin uses the following configuration options by default. The configuration file is the same as Jekyll's (which is `_config.yml` unless overridden):
 
 ```yml
-jekyll-imgwh:
+imgwh:
   allowed_schemes: []
   extra_rest:
 ```
@@ -140,7 +140,7 @@ Option `allowed_schemes` adds exception for the schemes specified in it. For URI
 For example, to allow HTTPS image URLs and [data URLs](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data) use the following:
 
 ```yml
-jekyll-imgwh:
+imgwh:
   allowed_schemes: ["data", "https"]
 ```
 
@@ -155,20 +155,20 @@ Remember `imgwh` tag syntax? This option injects additional text into all genera
 For example, since all generated HTML `<img>` elements get the size attributes, it might be a good idea to set lazy loading for the images:
 
 ```yml
-jekyll-imgwh:
+imgwh:
   extra_rest: loading="lazy"
 ```
 
 Like `<src>` and `<rest>`, `<extra_rest>` can also include Liquid markup, which is rendered in context of images where `<extra_rest>` is injected.
 
-# Troubleshooting
+## Troubleshooting
 
 When error is related to the image image file, plugin mentions the file path in the error message:
 
-```
+```shell
 $ bundle exec jekyll serve
 <...>
-  Liquid Exception: jekyll-imgwh: 'Y:/ssg/assets/images/foo.png' could not be found in index.html
+  Liquid Exception: imgwh: 'Y:/ssg/assets/images/foo.png' could not be found in index.html
 <...>
 ```
 
@@ -176,27 +176,27 @@ Plugin also logs a lot of info which can help to resolve errors raised by it. Us
 
 For example, for template
 
-```
-{% imgwh "/assets/images/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo" %}
+```shell
+{% imgwh '/assets/images/{{ product.key }}.png' alt='{{ project.title }} Logo' class='www-logo' %}
 ```
 
 it would print something like this in case of successful generation:
 
-```
+```shell
 $ bundle exec jekyll serve --verbose
 <...>
-      jekyll-imgwh: ---
-      jekyll-imgwh: content: '"/assets/images/{{ product.key }}.png" alt="{{ project.title }} Logo" class="www-logo"'
-      jekyll-imgwh: src: '/assets/images/{{ product.key }}.png'
-      jekyll-imgwh: rest: 'alt="{{ project.title }} Logo" class="www-logo"'
-      jekyll-imgwh: src rendered: '/assets/images/foo.png'
-      jekyll-imgwh: image path: 'Y:/ssg/assets/images/foo.png'
-      jekyll-imgwh: image size: [128, 64]
-      jekyll-imgwh: rest rendered: 'alt="My Product Logo" class="www-logo"'
+      imgwh: ---
+      imgwh: markup: "'/assets/images/{{ site.key }}.png' alt='{{ site.title }} Logo' class='www-logo'"
+      imgwh: src: "/assets/images/{{ site.key }}.png"
+      imgwh: rest: "alt='{{ site.title }} Logo' class='www-logo'"
+      imgwh: src rendered: "/assets/images/foo.png"
+      imgwh: image path: 'Y:/ssg/assets/images/foo.png'
+      imgwh: image size: [128, 64]
+      imgwh: rest rendered: "alt='My Product Logo' class='www-logo'"
 <...>
 ```
 
-# Development
+## Development
 
 To get started with the development:
 
@@ -205,4 +205,28 @@ git clone https://github.com/ojuuji/jekyll-imgwh.git
 cd jekyll-imgwh
 bundle install
 bundle exec rspec
+```
+
+### Using in own code
+
+Example how to use the path resolving logic from the plugin in your code:
+
+```ruby
+require "jekyll/imgwh/helpers"
+
+module Utils
+  def file_size(src)
+    File.size(resolve_path(src, @context))
+  end
+
+  Liquid::Template.register_filter(self)
+
+  include Jekyll::Imgwh::Helpers
+end
+```
+
+Save it as `_plugins/file_size.rb` in your site (can use other file name but must place in `_plugins` directory unless it is overridden in the site config). Now you can use it like this:
+
+```liquid
+{{ "/attachments/some/archive.tar.gz" | file_size }}
 ```

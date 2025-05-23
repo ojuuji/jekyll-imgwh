@@ -23,7 +23,7 @@ describe Jekyll::Imgwh::Tag do
 
     it "is searched in the source dir (per Jekyll's in_source_dir)" do
       expect { output }.to \
-        raise_error(LoadError, "jekyll-imgwh: '#{source "/error.png"}' could not be found")
+        raise_error(LoadError, "imgwh: '#{source "/error.png"}' could not be found")
     end
   end
 
@@ -152,7 +152,7 @@ describe Jekyll::Imgwh::Tag do
   end
 
   context "with extra_rest option" do
-    let(:overrides) { { "jekyll-imgwh" => { "extra_rest" => 'loading="lazy"' } } }
+    let(:overrides) { { "imgwh" => { "extra_rest" => 'loading="lazy"' } } }
     let(:content) { "{% imgwh /123x67.png alt='Hi' %}" }
 
     it "inserts extra_rest before rest" do
@@ -160,7 +160,7 @@ describe Jekyll::Imgwh::Tag do
     end
 
     context "when extra_rest has liquid" do
-      let(:overrides) { { "jekyll-imgwh" => { "extra_rest" => '<!--{{ "X" | append: "Y" }}-->' } } }
+      let(:overrides) { { "imgwh" => { "extra_rest" => '<!--{{ "X" | append: "Y" }}-->' } } }
       let(:content) { "{% imgwh /123x67.png %}" }
 
       it "is rendered" do
@@ -177,7 +177,7 @@ describe Jekyll::Imgwh::Tag do
     end
 
     context "when uri scheme is in allowed_schemes option" do
-      let(:overrides) { { "jekyll-imgwh" => { "allowed_schemes" => ["data"] } } }
+      let(:overrides) { { "imgwh" => { "allowed_schemes" => ["data"] } } }
       let(:content) { "{% imgwh data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI1Ii8+ %}" }
 
       it "processes image" do

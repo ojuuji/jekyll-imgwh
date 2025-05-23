@@ -3,14 +3,17 @@
 require "cgi"
 require "fastimage"
 require "jekyll"
-require "jekyll/imgwh/version"
 require "uri"
 
 module Jekyll
   module Imgwh
     module Helpers
-      def debug(message)
-        Jekyll.logger.debug "#{NAME}:", message
+      def name
+        "imgwh"
+      end
+
+      def debug(*messages)
+        messages.each { |message| Jekyll.logger.debug "#{name}:", message }
       end
 
       def image_size(src, context)
@@ -19,13 +22,13 @@ module Jekyll
         if uri.scheme.nil?
           src = resolve_path(CGI.unescape(uri.path), context)
         else
-          allowed_schemes = context.registers[:site].config.dig(NAME, "allowed_schemes") || []
+          allowed_schemes = context.registers[:site].config.dig(name, "allowed_schemes") || []
           unless allowed_schemes.include?(uri.scheme)
-            raise ArgumentError, "#{NAME}: URIs with '#{uri.scheme}' scheme are not allowed"
+            raise ArgumentError, "#{name}: URIs with '#{uri.scheme}' scheme are not allowed"
           end
         end
 
-        FastImage.size(src) or raise LoadError, "#{NAME}: could not get size of image '#{src}'"
+        FastImage.size(src) or raise LoadError, "#{name}: could not get size of image '#{src}'"
       end
 
       def resolve_path(path, context)
@@ -35,12 +38,12 @@ module Jekyll
         return local_path if File.file?(local_path)
 
         themed_path = context.registers[:site].in_theme_dir(path) if path.start_with?("/")
-        raise LoadError, "#{NAME}: '#{local_path}' could not be found" unless themed_path
+        raise LoadError, "#{name}: '#{local_path}' could not be found" unless themed_path
 
         debug "themed image path: '#{themed_path}'"
         return themed_path if File.file?(themed_path)
 
-        raise LoadError, "#{NAME}: none of '#{local_path}', '#{themed_path}' could be found"
+        raise LoadError, "#{name}: none of '#{local_path}', '#{themed_path}' could be found"
       end
     end
   end
