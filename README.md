@@ -75,6 +75,16 @@ For unquoted `<src>` whitespace is allowed only within Liquid filters (i.e. betw
 
 Note, in the last example, although plugin did not fire an error, generated `src` attribute is not valid (`<img>` element would use `src=/My`). After rendering Liquid markup in the `<src>` value, plugin does not perform any further normalization for the resulting URI. It is up to the caller to provide correct URI. Plugin only extracts and URL-decodes the path from it.
 
+When rendering markup for `imgwh` tag, plugin adds `imgwh_quote` variable to the rendering context. This variable contains the quote character used in the `imgwh` tag currently being evaluated. Note, it is available only in the markup used inside `imgwh` tag.
+
+Examples:
+
+```liquid
+{% imgwh "/foo.png" bar={{imgwh_quote}}baz{{imgwh_quote}} %} ⟶ <img src="/foo.png" ... bar="baz">
+{% imgwh '/foo.png' bar={{imgwh_quote}}baz{{imgwh_quote}} %} ⟶ <img src='/foo.png' ... bar='baz'>
+{% imgwh  /foo.png  bar={{imgwh_quote}}baz{{imgwh_quote}} %} ⟶ <img src=/foo.png ... bar=baz>
+```
+
 ### Liquid Filter
 
 This plugin exposes a Liquid filter `imgwh`, which returns image size as an array.
@@ -126,7 +136,7 @@ This plugin uses the following configuration options by default. The configurati
 ```yml
 imgwh:
   allowed_schemes: []
-  extra_rest: loading="lazy"
+  extra_rest: loading={{imgwh_quote}}lazy{{imgwh_quote}}
 ```
 
 These are default options i.e. you do not need to specify any of them unless you want to use different value.

@@ -27,13 +27,19 @@ module Jekyll
       def render(context)
         debug "---", "markup: #{@markup.inspect}", "src: #{@src.inspect}", "rest: #{@rest.inspect}"
 
-        src = Liquid::Template.parse(@src).render(context)
-        debug "src rendered: #{src.inspect}"
-        img = "<img src=#{quoted src}"
+        context.stack do
+          context["#{@tag_name}_quote"] = @quote
 
-        size = image_size(src, context)
-        debug "image size: #{size}"
-        img << " width=#{quoted size[0]} height=#{quoted size[1]}" << render_rest(context) << ">"
+          src = Liquid::Template.parse(@src).render(context)
+          debug "src rendered: #{src.inspect}"
+
+          size = image_size(src, context)
+          debug "image size: #{size}"
+
+          rest = render_rest(context)
+
+          "<img src=#{quoted src} width=#{quoted size[0]} height=#{quoted size[1]}#{rest}>"
+        end
       end
 
       private
@@ -45,8 +51,8 @@ module Jekyll
       def render_rest(context)
         rest = +""
 
-        site = context.registers[:site]
-        extra_rest = site.config.dig(@tag_name, "extra_rest") || "loading=#{quoted "lazy"}"
+        extra_rest = context.registers[:site].config.dig(@tag_name, "extra_rest")
+        extra_rest ||= "loading={{#{@tag_name}_quote}}lazy{{#{@tag_name}_quote}}"
         unless extra_rest.empty?
           extra_rest = Liquid::Template.parse(extra_rest).render(context)
           debug "extra_rest rendered: #{extra_rest.inspect}"

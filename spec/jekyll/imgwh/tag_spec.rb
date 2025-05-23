@@ -193,4 +193,12 @@ describe Jekyll::Imgwh::Tag do
       end
     end
   end
+
+  context "with imgwh_quote variable" do
+    let(:content) { %({% imgwh "/123x67.png" !a{{imgwh_quote}}b! %}{% imgwh '/123x67.png' !c{{imgwh_quote}}d! %}{% imgwh /123x67.png !e{{imgwh_quote}}f! %}) }
+
+    it "is rendered as current quote character" do
+      expect(output).to include('!a"b!', "!c'd!", "!ef!")
+    end
+  end
 end
